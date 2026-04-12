@@ -1,0 +1,12 @@
+a service that takes in a valid url and returns a shortened url, 
+redirecting the user to the previously provided url.
+it also keeps track of total visits/clicks on the url.
+
+Routes:
+
+POST /url: generates a new short url and returns the shortened url in the formal example.com/random-id
+
+GET /:id:  Redirects the user to the original url
+
+GET /url/analytics/:id: returns the clicks for provided short id.
+
