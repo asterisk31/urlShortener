@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const { v4: uuid } = require("uuid");
-const { setUser, getUser } = require("../service/auth");
+//const { setUser } = require("../service/auth");
+const { setUser } = require("../service/jwt_auth");
 
 async function handleUserSignup(req, res) {
   const { name, email, password } = req.body;
@@ -21,9 +22,15 @@ async function handleLogin(req, res) {
     });
   }
 
-  const sessionId = uuid();
-  setUser(sessionId, user);
-  res.cookie("uid", sessionId);
+  //stateful auth
+  // const sessionId = uuid();
+  // setUser(sessionId, user);
+  // res.cookie("uid", sessionId);
+
+  //jwt auth
+  const token = setUser(user);
+  res.cookie("uid", token);
+
   return res.redirect("/");
 }
 
