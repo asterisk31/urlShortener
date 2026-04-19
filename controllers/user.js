@@ -29,7 +29,9 @@ async function handleLogin(req, res) {
 
   //jwt auth
   const token = setUser(user);
-  res.cookie("uid", token);
+  //res.cookie("uid", token);
+  res.cookie("token", token);
+  //return res.json({ token });
 
   return res.redirect("/");
 }

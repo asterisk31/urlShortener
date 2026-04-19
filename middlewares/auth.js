@@ -1,28 +1,71 @@
 // const { getUser } = require("../service/auth");
 const { getUser } = require("../service/jwt_auth");
 
-async function restrictToLoggedInUserOnly(req, res, next) {
-  const userId = req.cookies.uid;
+function checkForAuth(req, res, next) {
+  //const authorizationHeaderValue = req.headers["authorization"];
+  const tokenCookie = req.cookies?.token;
 
-  if (!userId) return res.redirect("/login");
-  const user = getUser(userId);
+  req.user = null;
 
-  if (!user) return res.redirect("/login");
+  // if (
+  //   !authorizationHeaderValue ||
+  //   !authorizationHeaderValue.startsWith("Bearer")
+  // ) {
+  //   return next();
+  // }
+
+  if (!tokenCookie) return next();
+
+  //const token = userUid.split("Bearer ")[1];
+  const token = tokenCookie;
+  const user = getUser(token);
 
   req.user = user;
-  next();
+  return next();
 }
 
-async function checkAuth(req, res, next) {
-  const userId = req.cookies?.uid;
-  
-  const user = getUser(userId);
+// async function restrictToLoggedInUserOnly(req, res, next) {
+//   //const userId = req.cookies.uid;
+//   const userUid = req.header["authorization"];
 
-  req.user = user;
-  next();
+//   if (!userUid) return res.redirect("/login");
+//   const token = userUid.split("Bearer ")[1];
+//   //const user = getUser(userId);
+//   const user = getUser(token);
+
+//   if (!user) return res.redirect("/login");
+
+//   req.user = user;
+//   next();
+// }
+
+// async function checkAuth(req, res, next) {
+//   // const userId = req.cookies?.uid;
+//   const userUid = req.header["authorization"];
+//   const token = userUid.split("Bearer ")[1];
+
+//   // const user = getUser(userId);
+//   const user = getUser(token);
+
+//   req.user = user;
+//   next();
+// }
+
+function restrictTo(roles) {
+  return function (req, res, next) {
+    if (!req.user) return res.redirect("/login");
+
+    if (!roles.includes(req.user.role)) return res.end("unauthorized user");
+
+    return next();
+  };
 }
 
 module.exports = {
-  restrictToLoggedInUserOnly,
-  checkAuth,
+  // restrictToLoggedInUserOnly,
+  // checkAuth,
+  checkForAuth,
+  restrictTo,
 };
+
+//we need to refactor this so

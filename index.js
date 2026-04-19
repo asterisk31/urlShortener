@@ -4,7 +4,8 @@ const cookieParser = require("cookie-parser");
 
 const { connectToMongo } = require("./connect");
 
-const { restrictToLoggedInUserOnly, checkAuth } = require("./middlewares/auth");
+//const { restrictToLoggedInUserOnly, checkAuth } = require("./middlewares/auth");
+const { checkForAuth, restrictTo } = require("./middlewares/auth");
 
 const URL = require("./models/url");
 
@@ -25,10 +26,13 @@ app.set("views", path.resolve("./views"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(checkForAuth);
 
-app.use("/url", restrictToLoggedInUserOnly, urlRoute); //inline middleware: will work only when req is on '/url'
+//app.use("/url", restrictToLoggedInUserOnly, urlRoute); //inline middleware: will work only when req is on '/url'
+app.use("/url", restrictTo(["NORMAL", "ADMIN"]), urlRoute);
 app.use("/user", userRoute);
-app.use("/", checkAuth, staticRoute);
+//app.use("/", checkAuth, staticRoute);
+app.use("/", staticRoute);
 
 app.get("/:shortID", async (req, resp) => {
   const shortId = req.params.shortID;
